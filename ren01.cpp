@@ -15,6 +15,7 @@ using namespace std;
 int main()
 {
     Mat img,mid,dst,dst1,dst2,all_dst;
+    int count;
 
     vector<vector<Point>> contours;
     Rect re;
@@ -35,21 +36,31 @@ int main()
     img = imread("1.jpg");
     all_dst = Mat(600,600,img.type());
     cvtColor(img,mid,CV_BGR2HSV);
-    inRange(mid,Scalar(142,64,30),Scalar(180,255,255),dst);
-    inRange(mid,Scalar(0,0,118),Scalar(180,61,255),dst1);
-    inRange(mid,Scalar(2,44,116),Scalar(27,252,254),dst2);
+    inRange(mid,Scalar(162,64,53),Scalar(180,255,255),dst);//hong
+    inRange(mid,Scalar(0,0,150),Scalar(180,62,222),dst1);//bai
+    inRange(mid,Scalar(16,44,116),Scalar(27,252,254),dst2);//huang
 
 
     findContours(dst,contours,RETR_CCOMP, CHAIN_APPROX_SIMPLE);
     findContours(dst1,contours1,RETR_CCOMP, CHAIN_APPROX_SIMPLE);
     findContours(dst2,contours2,RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
+    count = contours.size();
+    if(contours2.size()>contours1.size()&&contours2.size()>count)
+    {
+        count = contours2.size();
+    }
+    else if(contours1.size()>count&&contours1.size()>contours2.size())
+    {
+        count = contours1.size();
+    }
+
     for(auto i=0;i<contours.size();i++)
     {
         re = boundingRect(contours[i]);
         if(re.width*re.height>80000)
         {
-            end = ((Big*Focal)/((re.width/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+            end = ((Big*Focal)/((MAX(re.height,re.width)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
             drawContours(img,contours,i,Scalar(0,0,255),50);
             rectangle(img,re,Scalar(255),30);
             circle(all_dst,Point((600*re.x/img.cols+600*re.br().x/img.cols)/2,600-end),(600*re.width/img.rows)/2,Scalar(255),3);
@@ -63,7 +74,7 @@ int main()
         re1 = boundingRect(contours1[i]);
         if(re1.width*re1.height>30000&&re1.width*re1.height<1000000)
         {
-            end1 = ((Small*Focal)/((re1.width/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+            end1 = ((Small*Focal)/((MAX(re1.width,re1.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
             drawContours(img,contours1,i,Scalar(0,0,255),50);
             rectangle(img,re1,Scalar(255),30);
             circle(all_dst,Point((600*re1.x/img.cols+600*re1.br().x/img.cols)/2,600-end1),(600*re1.width/img.rows)/2,Scalar(255),-1);
@@ -77,7 +88,7 @@ int main()
         re2 = boundingRect(contours2[i]);
         if(re2.width*re2.height>1000000)
         {
-            end2 = ((Big*Focal)/((re2.width/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+            end2 = ((Big*Focal)/((MAX(re2.width,re2.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
             drawContours(img,contours2,i,Scalar(0,0,255),50);
             rectangle(img,re2,Scalar(255),30);
             circle(all_dst,Point((600*re2.x/img.cols+600*re2.br().x/img.cols)/2,600-end2),(600*re2.width/img.rows)/2,Scalar(255),3);
@@ -85,6 +96,7 @@ int main()
             putText(img,text2,Point(re2.x,re2.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
         }
     }
+
 
 
     namedWindow("dst",0);
