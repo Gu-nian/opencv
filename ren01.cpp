@@ -15,7 +15,7 @@ using namespace std;
 int main()
 {
     Mat img,mid,dst,dst1,dst2,all_dst;
-    int count;
+    size_t count,count1,count2;
 
     vector<vector<Point>> contours;
     Rect re;
@@ -46,56 +46,79 @@ int main()
     findContours(dst2,contours2,RETR_CCOMP, CHAIN_APPROX_SIMPLE);
 
     count = contours.size();
-    if(contours2.size()>contours1.size()&&contours2.size()>count)
-    {
-        count = contours2.size();
-    }
-    else if(contours1.size()>count&&contours1.size()>contours2.size())
-    {
-        count = contours1.size();
-    }
+    count1 = contours1.size();
+    count2 = contours2.size();
 
-    for(auto i=0;i<contours.size();i++)
+    for(auto i=0;i<MAX(count,MAX(count1,count2));i++)
     {
-        re = boundingRect(contours[i]);
-        if(re.width*re.height>80000)
+        if(i<contours.size())
         {
-            end = ((Big*Focal)/((MAX(re.height,re.width)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
-            drawContours(img,contours,i,Scalar(0,0,255),50);
-            rectangle(img,re,Scalar(255),30);
-            circle(all_dst,Point((600*re.x/img.cols+600*re.br().x/img.cols)/2,600-end),(600*re.width/img.rows)/2,Scalar(255),3);
-            text = to_string(end/10);
-            putText(img,text,Point(re.x,re.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+            re = boundingRect(contours[i]);
+            if(re.width*re.height>80000)
+            {
+                end = ((Big*Focal)/((MAX(re.height,re.width)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+                drawContours(img,contours,i,Scalar(0,0,255),50);
+                rectangle(img,re,Scalar(255),30);
+                circle(all_dst,Point((600*re.x/img.cols+600*re.br().x/img.cols)/2,600-end),(600*re.width/img.rows)/2,Scalar(255),3);
+                text = to_string(end/10);
+                putText(img,text,Point(re.x,re.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+            }
+        }
+         if(i<contours1.size())
+        {
+            re1 = boundingRect(contours1[i]);
+            if(re1.width*re1.height>30000&&re1.width*re1.height<1000000)
+            {
+                end1 = ((Small*Focal)/((MAX(re1.width,re1.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+                drawContours(img,contours1,i,Scalar(0,0,255),50);
+                rectangle(img,re1,Scalar(255),30);
+                circle(all_dst,Point((600*re1.x/img.cols+600*re1.br().x/img.cols)/2,600-end1),(600*re1.width/img.rows)/2,Scalar(255),-1);
+                text1 = to_string(end1/10);
+                putText(img,text1,Point(re1.x,re1.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+            }
+        }
+         if(i<contours2.size())
+        {
+            re2 = boundingRect(contours2[i]);
+            if(re2.width*re2.height>1000000)
+            {
+                end2 = ((Big*Focal)/((MAX(re2.width,re2.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+                drawContours(img,contours2,i,Scalar(0,0,255),50);
+                rectangle(img,re2,Scalar(255),30);
+                circle(all_dst,Point((600*re2.x/img.cols+600*re2.br().x/img.cols)/2,600-end2),(600*re2.width/img.rows)/2,Scalar(255),3);
+                text2 = to_string(end2/10);
+                putText(img,text2,Point(re2.x,re2.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+            }
         }
     }
 
-    for(auto i=0;i<contours1.size();i++)
-    {
-        re1 = boundingRect(contours1[i]);
-        if(re1.width*re1.height>30000&&re1.width*re1.height<1000000)
-        {
-            end1 = ((Small*Focal)/((MAX(re1.width,re1.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
-            drawContours(img,contours1,i,Scalar(0,0,255),50);
-            rectangle(img,re1,Scalar(255),30);
-            circle(all_dst,Point((600*re1.x/img.cols+600*re1.br().x/img.cols)/2,600-end1),(600*re1.width/img.rows)/2,Scalar(255),-1);
-            text1 = to_string(end1/10);
-            putText(img,text1,Point(re1.x,re1.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
-        }
-    }
+//    for(auto i=0;i<contours1.size();i++)
+//    {
+//        re1 = boundingRect(contours1[i]);
+//        if(re1.width*re1.height>30000&&re1.width*re1.height<1000000)
+//        {
+//            end1 = ((Small*Focal)/((MAX(re1.width,re1.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+//            drawContours(img,contours1,i,Scalar(0,0,255),50);
+//            rectangle(img,re1,Scalar(255),30);
+//            circle(all_dst,Point((600*re1.x/img.cols+600*re1.br().x/img.cols)/2,600-end1),(600*re1.width/img.rows)/2,Scalar(255),-1);
+//            text1 = to_string(end1/10);
+//            putText(img,text1,Point(re1.x,re1.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+//        }
+//    }
 
-    for(auto i=0;i<contours2.size();i++)
-    {
-        re2 = boundingRect(contours2[i]);
-        if(re2.width*re2.height>1000000)
-        {
-            end2 = ((Big*Focal)/((MAX(re2.width,re2.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
-            drawContours(img,contours2,i,Scalar(0,0,255),50);
-            rectangle(img,re2,Scalar(255),30);
-            circle(all_dst,Point((600*re2.x/img.cols+600*re2.br().x/img.cols)/2,600-end2),(600*re2.width/img.rows)/2,Scalar(255),3);
-            text2 = to_string(end2/10);
-            putText(img,text2,Point(re2.x,re2.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
-        }
-    }
+//    for(auto i=0;i<contours2.size();i++)
+//    {
+//        re2 = boundingRect(contours2[i]);
+//        if(re2.width*re2.height>1000000)
+//        {
+//            end2 = ((Big*Focal)/((MAX(re2.width,re2.height)/Focal)*Transformation)+(tan(CV_PI/6)*Height));
+//            drawContours(img,contours2,i,Scalar(0,0,255),50);
+//            rectangle(img,re2,Scalar(255),30);
+//            circle(all_dst,Point((600*re2.x/img.cols+600*re2.br().x/img.cols)/2,600-end2),(600*re2.width/img.rows)/2,Scalar(255),3);
+//            text2 = to_string(end2/10);
+//            putText(img,text2,Point(re2.x,re2.y-100),FONT_HERSHEY_SIMPLEX,10,Scalar(0,255,0),30);
+//        }
+//    }
 
 
 
